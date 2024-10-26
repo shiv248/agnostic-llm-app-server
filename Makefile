@@ -21,4 +21,4 @@ clean:
 	find . -name '__pycache__' -exec rm -rf {} +
 	find . -name '.pytest_cache' -exec rm -rf {} +
 	find . -name '*.pyc' -exec rm -f {} +
-	@echo "Cleaned up! check if you have the virtual environment still activate!"
+	@echo "Cleaned up! check if you have a manual virtual environment still activate!"
