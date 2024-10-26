@@ -57,12 +57,14 @@ def _call_model(state: GraphsState, config: RunnableConfig):
     app_logs = app_data['app_logs']
 
     template = """
+    you do NOT have access to tools or functions, do NOT make calls to tools or functions ever.
+
     you are an application here is the objective below:
 
     {prompt}
 
     the message history between the application and the user so far is:
-    {app_logs}
+
 
     the user's message is:
     {user_msg} that uses the input_schema of {input_schema_properties}

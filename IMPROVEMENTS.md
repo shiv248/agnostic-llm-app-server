@@ -5,3 +5,4 @@
 - better integration testing for mock external apis
 - ws for streaming tokens
 - prompt conversation/logging summary, token limitation
+- more extensive input validation and cleaning
