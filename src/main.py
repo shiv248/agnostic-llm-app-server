@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import Response, FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -5,9 +6,9 @@ import uuid
 from datetime import datetime
 import json
 from typing import Dict, List, Any
-from .data_classes import ApplicationCreateRequest, validate_input_against_schema, validate_app_construct_input
-from .graph import ainvoke_our_graph
-from .cust_logger import logger, set_files_message_color
+from data_classes import ApplicationCreateRequest, validate_input_against_schema, validate_app_construct_input
+from graph import ainvoke_our_graph
+from cust_logger import logger, set_files_message_color
 
 set_files_message_color('PURPLE')
 
@@ -16,7 +17,8 @@ app = FastAPI(title="LLM Application Server")
 # In-memory storage for applications
 applications: Dict[str, Dict] = {}
 
-app.mount("/static", StaticFiles(directory="src/static"), name="static")
+static_dir = os.path.join(os.path.dirname(__file__), 'static')
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 @app.get("/", response_class=FileResponse)
 async def serve_index():
