@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Application Server ~ Shivanshu Gupta</title>
+
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+        input, textarea, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: none;
+            overflow: hidden;
+        }
+        .output {
+            background: #fff;
+            padding: 15px;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+
+        button {
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        button:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        button:active {
+            background-color: #0056b3;
+            color: white;
+            transform: scale(0.98);
+        }
+
+        .spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 5px solid #ddd;
+            border-top: 5px solid #333;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+</head>
+<body>
+
+<h1>LLM Application Server</h1>
+
+<h3>by Shivanshu Gupta<h3>
+
+<h2>Create Application</h2>
+<label for="prompt_config">Prompt Configuration</label>
+<textarea id="prompt_config"></textarea>
+
+<label for="input_schema">Input Schema (JSON format)</label>
+<textarea id="input_schema"></textarea>
+
+<label for="output_schema">Output Schema (JSON format)</label>
+<textarea id="output_schema"></textarea>
+
+<button onclick="createApplication()">Create Application</button>
+
+<div id="application_result" class="output hidden">
+    <h3>Application ID: <span id="application_id"></span></h3>
+    <button onclick="deleteApplication()">Delete Application</button>
+</div>
+
+<h2>Generate Response</h2>
+<label for="completion_input">Input for Completion</label>
+<textarea id="completion_input"></textarea>
+<button onclick="generateCompletion()">Generate</button>
+
+<div id="spinner" class="spinner"></div>
+
+<div id="completion_result" class="output hidden">
+    <h3>Completion Response</h3>
+    <pre id="completion_output"></pre>
+</div>
+
+<h2>View Logs</h2>
+<button onclick="viewLogs()">View Logs</button>
+
+<div id="logs_result" class="output hidden">
+    <h3>Application Logs</h3>
+    <pre id="logs_output"></pre>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Prefill prompt configuration
+        document.getElementById("prompt_config").value = "You are an advanced sentiment analysis tool that evaluates text and returns a sentiment score.";
+
+        // Prefill input_schema
+        document.getElementById("input_schema").value = JSON.stringify({
+            type: "object",
+            properties: {
+                review_text: { type: "string" }
+            },
+            required: ["review_text"]
+        }, null, 2);
+
+        // Prefill output_schema
+        document.getElementById("output_schema").value = JSON.stringify({
+            type: "object",
+            properties: {
+                sentiment: { type: "string" }
+            }
+        }, null, 2);
+
+        // Prefill completion input
+        document.getElementById("completion_input").value = JSON.stringify({
+            review_text: "Great product!"
+        }, null, 2);
+
+        document.querySelectorAll("textarea").forEach(textarea => {
+            adjustTextareaHeight(textarea);
+        });
+    });
+
+    function adjustTextareaHeight(element) {
+        element.style.height = "auto";
+        element.style.height = element.scrollHeight + "px";
+    }
+
+    document.querySelectorAll("textarea").forEach(textarea => {
+        textarea.addEventListener("input", function() {
+            adjustTextareaHeight(this);
+        });
+    });
+
+    let applicationId = "";
+
+    async function createApplication() {
+        const promptConfig = document.getElementById("prompt_config").value.trim();
+        const inputSchema = document.getElementById("input_schema").value.trim();
+        const outputSchema = document.getElementById("output_schema").value.trim();
+
+        try {
+            const response = await fetch("/applications", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    prompt_config: promptConfig,
+                    input_schema: JSON.parse(inputSchema),
+                    output_schema: JSON.parse(outputSchema)
+                })
+            });
+
+            if (response.status === 500) {
+                throw new Error("Internal Server Error (500)");
+            }
+            if (!response.ok) throw new Error("Error creating application");
+
+            const result = await response.json();
+            applicationId = result.application_id;
+            document.getElementById("application_id").innerText = applicationId;
+            document.getElementById("application_result").classList.remove("hidden");
+        } catch (error) {
+            alert(error.message === "Internal Server Error (500)" ? "An internal server error occurred. Please try again later." : "Failed to create application. Check your input format.");
+        }
+    }
+
+    async function generateCompletion() {
+        const spinner = document.getElementById("spinner");
+        const completionInput = document.getElementById("completion_input").value.trim();
+        if (!applicationId) {
+            alert("Please create an application first!");
+            return;
+        }
+
+        try {
+            spinner.style.display = "block";
+
+            const response = await fetch(`/applications/${applicationId}/completions`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: completionInput
+            });
+
+            if (response.status === 500) {
+                throw new Error("Internal Server Error (500)");
+            }
+            if (!response.ok) throw new Error("Error generating response");
+
+            const result = await response.json();
+            document.getElementById("completion_output").innerText = JSON.stringify(result, null, 2);
+            document.getElementById("completion_result").classList.remove("hidden");
+        } catch (error) {
+            alert(error.message === "Internal Server Error (500)" ? "An internal server error occurred. Please try again later." : "Failed to generate completion. Check your input.");
+        } finally {
+            spinner.style.display = "none";
+        }
+    }
+
+    async function viewLogs() {
+        if (!applicationId) {
+            alert("Please create an application first!");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/applications/${applicationId}/completions/logs`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (response.status === 500) {
+                throw new Error("Internal Server Error (500)");
+            }
+            if (!response.ok) throw new Error("Error fetching logs");
+
+            const result = await response.json();
+            document.getElementById("logs_output").innerText = JSON.stringify(result, null, 2);
+            document.getElementById("logs_result").classList.remove("hidden");
+        } catch (error) {
+            alert(error.message === "Internal Server Error (500)" ? "An internal server error occurred. Please try again later." : "Failed to fetch logs.");
+        }
+    }
+
+    async function deleteApplication() {
+        if (!applicationId) {
+            alert("Please create an application first!");
+            return;
+        }
+
+        if (!confirm("Are you sure you want to delete this application?")) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/applications/${applicationId}`, {
+                method: "DELETE"
+            });
+
+            if (response.status === 500) {
+                throw new Error("Internal Server Error (500)");
+            }
+            if (response.status === 204) { // 204 No Content
+                alert("Application deleted successfully.");
+                location.reload();
+            } else {
+                throw new Error("Failed to delete application");
+            }
+        } catch (error) {
+            alert(error.message === "Internal Server Error (500)" ? "An internal server error occurred. Please try again later." : "Error deleting application. Please try again.");
+        }
+    }
+</script>
+
+</body>
+</html>
