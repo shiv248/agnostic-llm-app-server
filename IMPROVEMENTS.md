@@ -3,3 +3,5 @@
 - be able to handle nested json in completion for validate input, validate_output_against_schema
 - dynamically create pydantic BaseModel using pydantic.create_model
 - better integration testing for mock external apis
+- ws for streaming tokens
+- prompt conversation/logging summary, token limitation

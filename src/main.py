@@ -33,7 +33,7 @@ def create_application(request: Dict[str, Any]):
         "prompt": validated_schema.prompt_config,
         "input_schema": validated_schema.input_schema.model_dump(),
         "output_schema": validated_schema.output_schema.model_dump(),
-        "app_logs": [{"msg":"Application Created", "timestamp":datetime.now().isoformat()}]
+        "app_logs": [{"sender":"user", "msg":"Application Created", "timestamp":datetime.now().isoformat()}]
     }
 
     return {
@@ -54,7 +54,7 @@ async def generate_response(application_id: str, request: Dict[str, Any]):
 
     # Retrieve the input schema for the application
     app_data = applications[application_id]
-    app_data["app_logs"].append({"msg":request, "timestamp":datetime.now().isoformat()})
+    app_data["app_logs"].append({"sender":"user", "msg":request, "timestamp":datetime.now().isoformat()})
 
     input_schema = app_data["input_schema"]
     output_schema = app_data["output_schema"]
@@ -67,10 +67,10 @@ async def generate_response(application_id: str, request: Dict[str, Any]):
     resp = await ainvoke_our_graph(request, app_data)
     try:
         decoded_resp = json.loads(resp)
-        app_data["app_logs"].append({"msg":decoded_resp, "timestamp":datetime.now().isoformat()})
+        app_data["app_logs"].append({"sender":"ai", "msg": decoded_resp, "timestamp":datetime.now().isoformat()})
         return decoded_resp
     except json.JSONDecodeError:
-        app_data["app_logs"].append({"msg": {"message": resp}, "timestamp":datetime.now().isoformat()})
+        app_data["app_logs"].append({"sender":"ai", "msg": {"message": resp}, "timestamp":datetime.now().isoformat()})
         return {"message": resp}
 
 @app.get("/applications/{application_id}/completions/logs")

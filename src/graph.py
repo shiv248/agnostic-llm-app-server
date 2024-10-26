@@ -13,6 +13,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.messages import HumanMessage
 from .data_classes import validate_output_against_schema
 from .cust_logger import logger, set_files_message_color
+from datetime import datetime
 
 set_files_message_color('MAGENTA')
 
@@ -33,7 +34,7 @@ try:
         streaming=True,
         max_tokens=256
     )
-    logger.info("Model initialized successfully.")
+    logger.info({"timestamp": datetime.now().isoformat(), "msg": "Model initialized successfully. Ready to use!", "data": f"with {env_var_key}"})
 except Exception as e:
     # Log error if model initialization fails, exits. no vroom vroom :(
     logger.fatal(f"Fatal Error: Failed to initialize model: {e}")
@@ -49,6 +50,7 @@ def _call_model(state: GraphsState, config: RunnableConfig):
     user_msg = internal_hist[0]
     error_hist = internal_hist[1:]
     app_data = config["configurable"]["app_details"]
+    app_uuid = app_data["uuid"]
     app_prompt = app_data['prompt']
     input_schema_properties = app_data['input_schema']["properties"]
     output_schema_properties = app_data['output_schema']["properties"]
@@ -87,14 +89,25 @@ def _call_model(state: GraphsState, config: RunnableConfig):
         output_schema_properties=output_schema_properties
     )
 
-    logger.info("Calling model with prompt.")
+    log_data = {
+        "internal_hist": internal_hist,
+        "user_msg": user_msg,
+        "error_hist": error_hist,
+        "app_prompt": app_prompt,
+        "input_schema_properties": input_schema_properties,
+        "output_schema_properties": output_schema_properties,
+        "app_logs": app_logs
+    }
+
+    logger.info({"timestamp": datetime.now().isoformat(), "uuid": app_uuid, "msg": "Calling model with formatted prompt.", "data": log_data})
     response = llm.invoke(final_prompt)
-    logger.info("Model response received.")
 
     return {"internal_hist": [response.content]}
 
 def conditional_check(state: GraphsState, config: RunnableConfig):
+    app_uuid = config["configurable"]["app_details"]["uuid"]
     last_msg = state["internal_hist"][-1]
+    logger.info({"timestamp": datetime.now().isoformat(), "uuid": app_uuid, "msg": "Model response received.", "data": last_msg})
     if isinstance(last_msg, str) and last_msg.startswith('{') and last_msg.endswith('}'):
         try:
             json_object = json.loads(last_msg)
@@ -102,26 +115,25 @@ def conditional_check(state: GraphsState, config: RunnableConfig):
             output_schema = app_data['output_schema']
             validation_errors = validate_output_against_schema(json_object, output_schema)
             if validation_errors:
-                logger.error(f"Schema validation failed with errors: {', '.join(validation_errors)}")
+                logger.error({"timestamp": datetime.now().isoformat(), "uuid": app_uuid, "msg": "Schema validation failed with errors", "data": f"{', '.join(validation_errors)}"})
                 return {"internal_hist": [f"ERROR_SCHEMA - {', '.join(validation_errors)}"]}
-            logger.info("Schema validation passed.")
             return state
         except json.JSONDecodeError as e:
-            logger.error(f"JSON decoding failed: {e}")
+            logger.error({"timestamp": datetime.now().isoformat(), "uuid": app_uuid, "msg": "JSON decoding failed", "data": f"{e}"})
             return {"internal_hist": [f"ERROR_JSON - converting string to JSON: {e}"]}
     else:
-        logger.error("Invalid response format. Expected JSON.")
+        logger.error({"timestamp": datetime.now().isoformat(), "uuid": app_uuid, "msg": "Invalid response format. Expected JSON.", "data": last_msg})
         return {"internal_hist": ["ERROR_JSON - Invalid response format. Respond only in JSON starting with `{` and ending with `}`"]}
 
-def should_retry(state: GraphsState):
+def should_retry(state: GraphsState, config: RunnableConfig):
+    app_uuid = config["configurable"]["app_details"]["uuid"]
     last_msg = state["internal_hist"][-1]
     if isinstance(last_msg, str) and last_msg.startswith('ERROR'):
-        logger.info("Error detected in last message, retrying.")
+        logger.warning({"timestamp": datetime.now().isoformat(), "uuid": app_uuid, "msg": "Error detected in last message, retrying.", "data": ""})
         return True
-    logger.info("No errors detected, no retry needed.")
+    logger.info({"timestamp": datetime.now().isoformat(), "uuid": app_uuid, "msg": "response is valid", "data": ""})
     return False
 
-# Define graph structure with appropriate logging
 graph.add_node("retry_check", conditional_check)
 graph.add_node("model_node", _call_model)
 graph.add_edge(START, "model_node")
@@ -139,9 +151,10 @@ graph_runnable = graph.compile()
 
 async def ainvoke_our_graph(message: Union[str, dict], app_details: Dict[str, Any]):
     thread_config = {"configurable": {"app_details": app_details}}
+    print()
     if isinstance(message, dict):
         message = json.dumps(message)
-    logger.info("Starting asynchronous graph invocation.")
     messages = await graph_runnable.ainvoke({"internal_hist": [message]}, thread_config)
-    logger.info("Graph invocation completed.")
-    return messages["internal_hist"][-1]
+    resp = messages["internal_hist"][-1]
+    logger.info({"timestamp": datetime.now().isoformat(), "uuid": app_details["uuid"], "msg": "Graph invocation complete", "data": resp})
+    return resp
