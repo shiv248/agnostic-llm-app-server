@@ -9,7 +9,7 @@ services:
       PYTHONPATH: "/app/src"
       MONGO_URI: "mongodb://mongodb:27017/apps_db"  # MongoDB connection URI used in llm project
     volumes:
-      - ./src:/app/src  # for live code updates
+      - ../src:/app/src  # for live code updates or to access the replica logs
     deploy:
       replicas: 3  # Horizontal scale to 3 replicas
       restart_policy:
