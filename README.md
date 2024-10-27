@@ -114,13 +114,14 @@ Follow these steps to get the application up and running:
 - LangGraph retry mechanism with output data validation and output correction
 - LangChain for flexable LLM provider switching
 - Scalable with 3 replicas and a round-robin Nginx load balancer, data agnostic application with MongoDB as golden source
+- comments throughout the codebase describing obscure implementations and assumptions
 
 ---
 
 ### Endpoints
 
 #### 1. **GET /** - Serve Index Page
-Returns the frontend HTML for the application�s main page.
+Returns the frontend HTML for the application's main page.
 
 - **Path**: `/`
 - **Method**: `GET`
@@ -193,7 +194,7 @@ Deletes an existing application by its unique identifier.
       ```
 
 #### 4. **POST /applications/{application_id}/completions** - Generate LLM Completion
-Generates a response based on the application�s configuration and user input, invoking the LLM.
+Generates a response based on the application's configuration and user input, invoking the LLM.
 
 - **Path**: `/applications/{application_id}/completions`
 - **Method**: `POST`
