@@ -1,9 +1,14 @@
 import unittest
 
-from src.data_classes import ApplicationCreateRequest, validate_input_against_schema, validate_output_against_schema, validate_app_construct_input
+from src.data_classes import ApplicationCreateRequest, validate_input_against_schema, validate_output_against_schema, \
+    validate_app_construct_input
 
 
 class TestValidationFunctions(unittest.TestCase):
+    """
+    Unit tests for validation functions in the LLM Application Server, covering schema validation
+    for input and output as well as application construction requests.
+    """
 
     def test_validate_input_against_schema_valid(self):
         """Test validate_input_against_schema with valid input that matches schema."""
@@ -23,7 +28,7 @@ class TestValidationFunctions(unittest.TestCase):
         self.assertIsNone(errors)
 
     def test_validate_input_against_schema_missing_required(self):
-        """Test validate_input_against_schema with missing required field."""
+        """Test validate_input_against_schema with missing required field 'review_text'."""
         schema_data = {
             "type": "object",
             "properties": {
@@ -36,7 +41,7 @@ class TestValidationFunctions(unittest.TestCase):
         self.assertIn("Missing required field: 'review_text'", errors)
 
     def test_validate_input_against_schema_unexpected_field(self):
-        """Test validate_input_against_schema with an unexpected field in input."""
+        """Test validate_input_against_schema with an unexpected field 'extra_field' in input."""
         schema_data = {
             "type": "object",
             "properties": {
@@ -46,13 +51,13 @@ class TestValidationFunctions(unittest.TestCase):
         }
         input_data = {
             "review_text": "Excellent service!",
-            "extra_field": "unexpected"
+            "extra_field": "unexpected"  # Unexpected field
         }
         errors = validate_input_against_schema(input_data, schema_data)
         self.assertIn("Unexpected field 'extra_field' in input data.", errors)
 
     def test_validate_input_against_schema_invalid_type(self):
-        """Test validate_input_against_schema with an invalid field type in input."""
+        """Test validate_input_against_schema with an invalid type for 'rating' (should be number)."""
         schema_data = {
             "type": "object",
             "properties": {
@@ -91,7 +96,7 @@ class TestValidationFunctions(unittest.TestCase):
         self.assertIsInstance(validated_schema, ApplicationCreateRequest)
 
     def test_validate_app_construct_input_missing_field(self):
-        """Test validate_app_construct_input with missing prompt_config."""
+        """Test validate_app_construct_input with missing 'prompt_config' field."""
         request_data = {
             "input_schema": {
                 "type": "object",
@@ -113,13 +118,13 @@ class TestValidationFunctions(unittest.TestCase):
         self.assertEqual(errors["msg"], "Missing required field: 'prompt_config'")
 
     def test_validate_app_construct_input_invalid_input_schema(self):
-        """Test validate_app_construct_input with invalid input_schema."""
+        """Test validate_app_construct_input with invalid 'type' in input_schema properties."""
         request_data = {
             "prompt_config": "Valid config",
             "input_schema": {
                 "type": "object",
                 "properties": {
-                    "review_text": {"type": 12345}  # Invalid type
+                    "review_text": {"type": 12345}  # Invalid type, should be a string
                 },
                 "required": ["review_text"]
             },
@@ -154,7 +159,8 @@ class TestValidationFunctions(unittest.TestCase):
         errors, validated_schema = validate_app_construct_input(request_data)
         self.assertIsNotNone(errors)
         self.assertIsNone(validated_schema)
-        self.assertTrue(any("Properties must be defined before specifying required fields." in error["msg"] for error in errors))
+        self.assertTrue(
+            any("Properties must be defined before specifying required fields." in error["msg"] for error in errors))
 
     def test_validate_output_against_schema_valid(self):
         """Test validate_output_against_schema with valid output that matches schema."""
@@ -173,7 +179,7 @@ class TestValidationFunctions(unittest.TestCase):
         self.assertIsNone(errors)
 
     def test_validate_output_against_schema_missing_field(self):
-        """Test validate_output_against_schema with a missing field specified in schema."""
+        """Test validate_output_against_schema with a missing 'score' field specified in schema."""
         schema_data = {
             "type": "object",
             "properties": {
@@ -189,7 +195,7 @@ class TestValidationFunctions(unittest.TestCase):
         self.assertIsNone(errors)  # No required fields specified, so should pass
 
     def test_validate_output_against_schema_unexpected_field(self):
-        """Test validate_output_against_schema with an unexpected field in output."""
+        """Test validate_output_against_schema with an unexpected 'extra_field' in output."""
         schema_data = {
             "type": "object",
             "properties": {
@@ -198,13 +204,13 @@ class TestValidationFunctions(unittest.TestCase):
         }
         output_data = {
             "summary": "Excellent product!",
-            "extra_field": "unexpected"
+            "extra_field": "unexpected"  # Unexpected field
         }
         errors = validate_output_against_schema(output_data, schema_data)
         self.assertIn("Unexpected field 'extra_field' in output data.", errors)
 
     def test_validate_output_against_schema_invalid_type(self):
-        """Test validate_output_against_schema with an invalid field type in output."""
+        """Test validate_output_against_schema with an invalid 'score' type (should be number)."""
         schema_data = {
             "type": "object",
             "properties": {
@@ -231,9 +237,8 @@ class TestValidationFunctions(unittest.TestCase):
         errors = validate_output_against_schema(output_data, schema_data)
         self.assertIn("Properties must not be empty.", errors[0])
 
-
     def test_validate_output_against_schema_nested_properties(self):
-        """Test validate_output_against_schema with nested properties."""
+        """Test validate_output_against_schema with nested properties in 'details' object."""
         schema_data = {
             "type": "object",
             "properties": {
