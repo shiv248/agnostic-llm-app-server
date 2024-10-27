@@ -3,12 +3,16 @@ import unittest
 from pydantic import ValidationError
 from src.data_classes import OutputSchema
 
+### Unit Test Class for OutputSchema ###
+
 class TestOutputSchema(unittest.TestCase):
     """
     Unit tests for OutputSchema validation.
     This class tests various aspects of OutputSchema such as nested properties,
     valid and invalid type specifications, and general schema structure.
     """
+
+    ### Valid Output Schema Test ###
 
     def test_output_schema_valid(self):
         """Test a valid OutputSchema with simple properties."""
@@ -21,6 +25,8 @@ class TestOutputSchema(unittest.TestCase):
         schema = OutputSchema(**valid_output_schema)
         self.assertEqual(schema.type, "object")
         self.assertEqual(schema.properties["sentiment"]["type"], "string")
+
+    ### Invalid Type Tests ###
 
     def test_output_schema_invalid_type(self):
         """Test OutputSchema with an invalid type (e.g., invalid_type instead of object)."""
@@ -35,8 +41,10 @@ class TestOutputSchema(unittest.TestCase):
         # Issue: 'invalid_type' is not 'object'
         self.assertIn("must be 'object'", str(context.exception))
 
+    ### Nested Properties Test ###
+
     def test_output_schema_with_nested_properties(self):
-        """Test OutputSchema with nested properties."""
+        """Test OutputSchema with valid nested properties."""
         valid_output_schema = {
             "type": "object",
             "properties": {
@@ -54,6 +62,8 @@ class TestOutputSchema(unittest.TestCase):
         self.assertEqual(schema.type, "object")
         self.assertIn("metadata", schema.properties)
         self.assertIn("confidence", schema.properties["metadata"]["properties"])
+
+    ### Invalid Nested Properties Test ###
 
     def test_output_schema_invalid_nested_property(self):
         """Test OutputSchema with an invalid type inside nested properties."""
@@ -73,6 +83,8 @@ class TestOutputSchema(unittest.TestCase):
             OutputSchema(**invalid_output_schema)
         # Issue: 'invalid_type' in the nested properties
         self.assertIn("Type 'invalid_type' in properties must be one of", str(context.exception))
+
+    ### Empty Properties Test ###
 
     def test_output_schema_empty_properties(self):
         """Test OutputSchema where 'properties' is an empty dictionary."""

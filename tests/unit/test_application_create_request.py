@@ -3,12 +3,16 @@ import unittest
 from pydantic import ValidationError
 from src.data_classes import ApplicationCreateRequest
 
+### Unit Test Class for ApplicationCreateRequest ###
+
 class TestApplicationCreateRequest(unittest.TestCase):
     """
     Unit tests for ApplicationCreateRequest validation.
     This class covers different cases for validating the ApplicationCreateRequest,
     such as valid requests, empty or whitespace prompt_config, and nested schemas.
     """
+
+    ### Valid Request Test ###
 
     def test_application_create_request_valid(self):
         """Test a valid ApplicationCreateRequest with both input and output schemas."""
@@ -31,10 +35,12 @@ class TestApplicationCreateRequest(unittest.TestCase):
         app_request = ApplicationCreateRequest(**valid_application_request)
         self.assertEqual(app_request.prompt_config, "You are an advanced sentiment analysis tool.")
 
+    ### Invalid Prompt Config Tests ###
+
     def test_application_create_request_empty_prompt_config(self):
         """Test ApplicationCreateRequest with an empty prompt_config (should raise validation error)."""
         invalid_application_request = {
-            "prompt_config": "",
+            "prompt_config": "", # invalid prompt empty
             "input_schema": {
                 "type": "object",
                 "properties": {
@@ -74,6 +80,8 @@ class TestApplicationCreateRequest(unittest.TestCase):
         with self.assertRaises(ValidationError) as context:
             ApplicationCreateRequest(**invalid_application_request)
         self.assertIn("Prompt configuration cannot be empty", str(context.exception))
+
+    ### Invalid Schema Type Tests ###
 
     def test_application_create_request_invalid_input_schema(self):
         """Test ApplicationCreateRequest with an invalid input schema (wrong type)."""
@@ -119,8 +127,10 @@ class TestApplicationCreateRequest(unittest.TestCase):
             ApplicationCreateRequest(**invalid_application_request)
         self.assertIn("must be 'object'", str(context.exception))
 
+    ### Complex Schema Test ###
+
     def test_application_create_request_with_complex_nested_schemas(self):
-        """Test ApplicationCreateRequest with complex nested input and output schemas."""
+        """Test ApplicationCreateRequest with valid complex nested input and output schemas."""
         valid_application_request = {
             "prompt_config": "You are an advanced sentiment analysis tool.",
             "input_schema": {

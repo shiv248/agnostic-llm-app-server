@@ -12,7 +12,7 @@ $(VENV_DIR)/bin/activate:
 run: install
 	PYTHONPATH=src $(VENV_DIR)/bin/python -m uvicorn src.main:app --host 0.0.0.0
 
-tests:
+tests: install
 	PYTHONPATH=src $(VENV_DIR)/bin/python -m unittest discover tests/unit
 	PYTHONPATH=src $(VENV_DIR)/bin/python -m unittest discover tests/integration
 

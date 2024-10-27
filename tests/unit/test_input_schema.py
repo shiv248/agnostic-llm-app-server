@@ -3,6 +3,7 @@ import unittest
 from pydantic import ValidationError
 from src.data_classes import InputSchema
 
+### Unit Test Class for InputSchema ###
 
 class TestInputSchema(unittest.TestCase):
     """
@@ -10,6 +11,8 @@ class TestInputSchema(unittest.TestCase):
     This class covers different cases for validating the InputSchema including
     valid schemas, invalid types, missing required fields, and nested structures.
     """
+
+    ### Valid Input Schema Test ###
 
     def test_input_schema_valid(self):
         """Test a valid InputSchema with multiple properties and required fields."""
@@ -25,6 +28,8 @@ class TestInputSchema(unittest.TestCase):
         self.assertEqual(schema.properties["review_text"]["type"], "string")
         self.assertIn("review_text", schema.required)
 
+    ### Invalid Type Tests ###
+
     def test_input_schema_invalid_type(self):
         """Test InputSchema with an invalid type ('array' instead of 'object')."""
         invalid_input_schema = {
@@ -38,6 +43,8 @@ class TestInputSchema(unittest.TestCase):
             InputSchema(**invalid_input_schema)
         # Issue: "type" is 'array', but must be 'object'
         self.assertIn("The schema 'type' must be 'object'", str(context.exception))
+
+    ### Missing Required Fields Tests ###
 
     def test_input_schema_missing_required_field_in_properties(self):
         """Test InputSchema where a required field is not defined in properties."""
@@ -64,8 +71,10 @@ class TestInputSchema(unittest.TestCase):
         # Issue: Required fields are specified, but properties are missing
         self.assertIn("Properties must be defined before specifying required fields.", str(context.exception))
 
+    ### Multiple Properties Test ###
+
     def test_input_schema_with_multiple_properties(self):
-        """Test InputSchema with multiple properties and multiple required fields."""
+        """Test InputSchema with multiple valid properties and multiple valid required fields."""
         valid_input_schema = {
             "type": "object",
             "properties": {
@@ -82,8 +91,10 @@ class TestInputSchema(unittest.TestCase):
         self.assertIn("review_text", schema.required)
         self.assertIn("rating", schema.required)
 
+    ### Nested Properties Test ###
+
     def test_input_schema_with_nested_properties(self):
-        """Test InputSchema with nested properties (object inside object)."""
+        """Test InputSchema with valid nested properties (object inside object)."""
         valid_input_schema = {
             "type": "object",
             "properties": {
@@ -104,6 +115,8 @@ class TestInputSchema(unittest.TestCase):
         self.assertIn("author", schema.properties)
         self.assertIn("name", schema.properties["author"]["properties"])
 
+    ### Invalid Properties Type Tests ###
+
     def test_input_schema_invalid_properties_type(self):
         """Test InputSchema with invalid type for properties fields (e.g., integer instead of string)."""
         invalid_input_schema = {
@@ -115,10 +128,11 @@ class TestInputSchema(unittest.TestCase):
         }
         with self.assertRaises(ValidationError) as context:
             InputSchema(**invalid_input_schema)
-        
+
         # Update the assertion to check for the correct error message
         self.assertIn("Each 'type' in properties must be a string", str(context.exception))
 
+    ### Empty and Undefined Properties Tests ###
 
     def test_input_schema_empty_properties_has_req(self):
         """Test InputSchema where 'properties' is an empty dictionary but required is defined"""
@@ -133,7 +147,6 @@ class TestInputSchema(unittest.TestCase):
         # Updated assertions to match the actual error message
         self.assertIn("Properties must be defined before specifying required fields", str(context.exception))
         self.assertIn("Value error", str(context.exception))
-
 
     def test_input_schema_no_properties_has_req(self):
         """Test InputSchema where 'properties' is not defined but required is defined."""

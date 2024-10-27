@@ -3,12 +3,15 @@ import unittest
 from src.data_classes import ApplicationCreateRequest, validate_input_against_schema, validate_output_against_schema, \
     validate_app_construct_input
 
+### Unit Test Class for Validation Functions ###
 
 class TestValidationFunctions(unittest.TestCase):
     """
     Unit tests for validation functions in the LLM Application Server, covering schema validation
     for input and output as well as application construction requests.
     """
+
+    ### Input Schema Validation Tests ###
 
     def test_validate_input_against_schema_valid(self):
         """Test validate_input_against_schema with valid input that matches schema."""
@@ -73,6 +76,8 @@ class TestValidationFunctions(unittest.TestCase):
         errors = validate_input_against_schema(input_data, schema_data)
         self.assertIn("Field 'rating' should be of type 'number'.", errors)
 
+    ### Application Construction Input Validation Tests ###
+
     def test_validate_app_construct_input_valid(self):
         """Test validate_app_construct_input with valid request data."""
         request_data = {
@@ -98,6 +103,7 @@ class TestValidationFunctions(unittest.TestCase):
     def test_validate_app_construct_input_missing_field(self):
         """Test validate_app_construct_input with missing 'prompt_config' field."""
         request_data = {
+            # missing prompt config
             "input_schema": {
                 "type": "object",
                 "properties": {
@@ -161,6 +167,8 @@ class TestValidationFunctions(unittest.TestCase):
         self.assertIsNone(validated_schema)
         self.assertTrue(
             any("Properties must be defined before specifying required fields." in error["msg"] for error in errors))
+
+    ### Output Schema Validation Tests ###
 
     def test_validate_output_against_schema_valid(self):
         """Test validate_output_against_schema with valid output that matches schema."""
