@@ -1,12 +1,14 @@
 import os
+import uuid
+import json
+from datetime import datetime
+from typing import Dict, Any
+
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import Response, FileResponse
 from fastapi.staticfiles import StaticFiles
-import uuid
-from datetime import datetime
-import json
-from typing import Dict, List, Any
-from data_classes import ApplicationCreateRequest, validate_input_against_schema, validate_app_construct_input
+
+from data_classes import validate_input_against_schema, validate_app_construct_input
 from graph import ainvoke_our_graph
 from cust_logger import logger, set_files_message_color
 

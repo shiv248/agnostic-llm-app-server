@@ -1,5 +1,5 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
-from pydantic import BaseModel, Field, validator, ValidationError, Extra
+from typing import Any, Dict, List, Optional, Tuple
+from pydantic import BaseModel, ValidationError, validator
 
 class InputSchema(BaseModel):
     type: str

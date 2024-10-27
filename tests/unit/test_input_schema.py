@@ -1,4 +1,5 @@
 import unittest
+
 from pydantic import ValidationError
 from src.data_classes import InputSchema
 
