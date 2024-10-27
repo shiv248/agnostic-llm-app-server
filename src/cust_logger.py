@@ -1,7 +1,8 @@
 #https://github.com/shiv248/LangGraphPy-x-ReactJS/blob/main/cust_logger.py
-
+import os
 import inspect
 import logging
+import json
 from colorama import Fore, Style, init
 from datetime import datetime
 
@@ -30,12 +31,33 @@ class ColorFormatter(logging.Formatter):
         log_output = f"{levelname}:     {filename_lineno} - {colored_message}"
         return log_output
 
-color_formatter = ColorFormatter('%(levelname)s: %(filename_lineno)s - %(message)s')
-handler = logging.StreamHandler()  # Console logging handler
-handler.setFormatter(color_formatter)  # Set our handler to our custom formatter above
+class JSONFormatter(logging.Formatter):
+    def format(self, record):
+        # Create a dictionary of log attributes
+        log_record = {
+            "level": record.levelname,
+            "timestamp": datetime.now().isoformat(),
+            "filename": record.filename,
+            "line": record.lineno,
+            "message": record.getMessage()
+        }
+        # Convert the dictionary to a JSON string
+        return json.dumps(log_record)
+
+log_formatter = ColorFormatter('%(levelname)s: %(filename_lineno)s - %(message)s')
+json_formatter = JSONFormatter()
+streamHandler = logging.StreamHandler()  # Console logging handler
+logs_dir = os.path.join(os.path.dirname(__file__), 'logs')
+os.makedirs(logs_dir, exist_ok=True)
+log_file = f'{logs_dir}/{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.log'
+file_handler = logging.FileHandler(log_file)  # Generates a timestamped log filename
+streamHandler.setFormatter(log_formatter)  # Set our handler to our custom color streaming formatter above
+file_handler.setFormatter(json_formatter) # Set our handler to our custom json formatter above
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)  # Set our logger level to INFO
-logger.addHandler(handler)
+logger.addHandler(streamHandler)
+logger.info(f"saving logs to {log_file} and streaming to console")
+logger.addHandler(file_handler)
 
 # Set logging level for external libraries to reduce clutter in terminal view
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -60,13 +82,13 @@ def set_files_message_color(color_name):
     caller_filename = frame.filename.split('/')[-1]  # Extract the filename
     color = COLOR_MAP.get(color_name.upper(), Style.RESET_ALL)  # Get color from COLOR_MAP if it exists otherwise default white
 
-    if color_formatter:
-        current_color = color_formatter.MESSAGE_COLOR_BY_FILE.get(caller_filename, None)
+    if log_formatter:
+        current_color = log_formatter.MESSAGE_COLOR_BY_FILE.get(caller_filename, None)
 
         if current_color == color:  # Avoid redundant color setting
             return
 
-        color_formatter.MESSAGE_COLOR_BY_FILE[caller_filename] = color
+        log_formatter.MESSAGE_COLOR_BY_FILE[caller_filename] = color
         logger.info(f"Set message color for {caller_filename} to {color_name.upper()}")  # Log the file color set to change
     else:
         # edge case if the color formatter wasn't setup properly

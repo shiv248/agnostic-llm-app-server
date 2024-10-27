@@ -7,3 +7,4 @@
 - prompt conversation/logging summary, token limitation
 - more extensive input validation and cleaning
 - probably not console log during integration test
+- better logging handling for json parsing json data when saving to file
