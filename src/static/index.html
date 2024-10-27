@@ -8,6 +8,7 @@
     <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
 
     <style>
+        /* Basic styling for a clean, simple UI */
         body {
             font-family: Arial, sans-serif;
             max-width: 600px;
@@ -15,6 +16,7 @@
             padding: 20px;
             background-color: #f4f4f9;
         }
+        /* Header and form element styling */
         h1 {
             color: #333;
         }
@@ -23,6 +25,7 @@
             margin-top: 10px;
             display: block;
         }
+        /* Input, textarea, select, and button elements styling for consistent UI */
         input, textarea, select, button {
             width: 100%;
             padding: 10px;
@@ -40,10 +43,12 @@
             margin-top: 10px;
             border-radius: 5px;
         }
+        /* Hide by default, shown on demand */
         .hidden {
             display: none;
         }
 
+        /* Button transition styling for user feedback */
         button {
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.1s ease;
@@ -58,12 +63,13 @@
             transform: scale(0.98);
         }
 
+        /* Spinner styling for loading indicator */
         .spinner {
             display: none;
             width: 40px;
             height: 40px;
             border: 5px solid #ddd;
-            border-top: 5px solid #333;
+            border-top: 5px solid #007bff;
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
             margin: 20px auto;
@@ -79,9 +85,10 @@
 <body>
 
 <h1>LLM Application Server</h1>
-<h4><i>Refuel.ai</i> take-home project by Shivanshu Gupta<h4>
+<h4><i>Refuel.ai</i> take-home project by Shivanshu Gupta</h4>
 
 <h2>Create Application</h2>
+<!-- Form for creating new application -->
 <label for="prompt_config">Prompt Configuration</label>
 <textarea id="prompt_config"></textarea>
 
@@ -93,23 +100,28 @@
 
 <button onclick="createApplication()">Create Application</button>
 
+<!-- Display application ID upon creation -->
 <div id="application_result" class="output hidden">
     <h3>Application ID: <span id="application_id"></span></h3>
     <button onclick="deleteApplication()">Delete Application</button>
 </div>
 
+<!-- Form for generating a completion response -->
 <h2>Generate Response</h2>
 <label for="completion_input">Input for Completion</label>
 <textarea id="completion_input"></textarea>
 <button onclick="generateCompletion()">Generate</button>
 
+<!-- Loading spinner shown while waiting for completion -->
 <div id="spinner" class="spinner"></div>
 
+<!-- Output area for completion response -->
 <div id="completion_result" class="output hidden">
     <h3>Completion Response</h3>
     <pre id="completion_output"></pre>
 </div>
 
+<!-- View logs for application requests/responses -->
 <h2>View Logs</h2>
 <button onclick="viewLogs()">View Logs</button>
 
@@ -120,10 +132,10 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        // Prefill prompt configuration
+        // Populate form fields with default values on page load for ease of testing
         document.getElementById("prompt_config").value = "You are an advanced sentiment analysis tool that evaluates text and returns a sentiment score.";
 
-        // Prefill input_schema
+        // Set default input_schema JSON format
         document.getElementById("input_schema").value = JSON.stringify({
             type: "object",
             properties: {
@@ -132,7 +144,7 @@
             required: ["review_text"]
         }, null, 2);
 
-        // Prefill output_schema
+        // Set default output_schema JSON format
         document.getElementById("output_schema").value = JSON.stringify({
             type: "object",
             properties: {
@@ -140,11 +152,12 @@
             }
         }, null, 2);
 
-        // Prefill completion input
+        // Set default input for completion generation
         document.getElementById("completion_input").value = JSON.stringify({
             review_text: "Great product!"
         }, null, 2);
 
+        // Automatically resize textareas based on content
         document.querySelectorAll("textarea").forEach(textarea => {
             adjustTextareaHeight(textarea);
         });
@@ -155,6 +168,7 @@
         element.style.height = element.scrollHeight + "px";
     }
 
+    // Event listener to dynamically resize textareas upon input
     document.querySelectorAll("textarea").forEach(textarea => {
         textarea.addEventListener("input", function() {
             adjustTextareaHeight(this);
@@ -163,6 +177,7 @@
 
     let applicationId = "";
 
+    // Function to create an application via POST request to API
     async function createApplication() {
         const promptConfig = document.getElementById("prompt_config").value.trim();
         const inputSchema = document.getElementById("input_schema").value.trim();
@@ -176,8 +191,8 @@
                 },
                 body: JSON.stringify({
                     prompt_config: promptConfig,
-                    input_schema: JSON.parse(inputSchema),
-                    output_schema: JSON.parse(outputSchema)
+                    input_schema: JSON.parse(inputSchema),  // Parse JSON format of input schema
+                    output_schema: JSON.parse(outputSchema)  // Parse JSON format of output schema
                 })
             });
 
@@ -195,6 +210,7 @@
         }
     }
 
+    // Function to generate a response from LLM for a given input
     async function generateCompletion() {
         const spinner = document.getElementById("spinner");
         const completionInput = document.getElementById("completion_input").value.trim();
@@ -211,7 +227,7 @@
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: completionInput
+                body: completionInput  // Pass input directly as body
             });
 
             if (response.status === 500) {
@@ -229,6 +245,7 @@
         }
     }
 
+    // Function to fetch logs for a specific application
     async function viewLogs() {
         if (!applicationId) {
             alert("Please create an application first!");
@@ -256,6 +273,7 @@
         }
     }
 
+    // Function to delete an application via DELETE request to API
     async function deleteApplication() {
         if (!applicationId) {
             alert("Please create an application first!");
@@ -276,7 +294,7 @@
             }
             if (response.status === 204) { // 204 No Content
                 alert("Application deleted successfully.");
-                location.reload();
+                location.reload();  // Refresh page to reset state
             } else {
                 throw new Error("Failed to delete application");
             }
