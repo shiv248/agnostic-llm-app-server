@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from data_classes import validate_input_against_schema, validate_app_construct_input
 from graph import ainvoke_our_graph
 from cust_logger import logger, set_files_message_color
-import db_conn
+from db_conn import database
 
 set_files_message_color('PURPLE')
 
@@ -47,7 +47,7 @@ def create_application(request: Dict[str, Any]):
         "app_logs": [{"sender": "user", "msg": "Application Created", "timestamp": datetime.now().isoformat()}]
     }
 
-    application_id = db_conn.create_application(application_id, valid_application_data)
+    application_id = database.create_application(application_id, valid_application_data)
 
     logger.info({"timestamp": datetime.now().isoformat(), "uuid": application_id, "msg": "New LLM Application", "data": valid_application_data})
 
@@ -58,7 +58,7 @@ def create_application(request: Dict[str, Any]):
 @app.delete("/applications/{application_id}", response_class=Response)
 def delete_application(application_id: str):
     # simple delete endpoint, with error handling if app doesn't exist
-    if db_conn.delete_application(application_id):
+    if database.delete_application(application_id):
         logger.info({"timestamp": datetime.now().isoformat(), "uuid": application_id, "msg": "Application deleted", "data": "delete"})
         return Response(status_code=204) # 204 No Content but deleted object, response
 
@@ -69,12 +69,12 @@ def delete_application(application_id: str):
 async def generate_response(application_id: str, request: Dict[str, Any]):
     # completion endpoint that handles input request validation against its respective application
 
-    app_data = db_conn.get_application(application_id)
+    app_data = database.get_application(application_id)
     if not app_data:
         logger.info({"timestamp": datetime.now().isoformat(), "uuid": application_id, "msg": "Application not found", "data": "completions"})
         raise HTTPException(status_code=404, detail="Application not found")
 
-    db_conn.log_application_interaction(application_id, {"sender":"user", "msg":request, "timestamp":datetime.now().isoformat()})
+    database.log_application_interaction(application_id, {"sender":"user", "msg":request, "timestamp":datetime.now().isoformat()})
 
     # Retrieve the input schema for the respective application
     input_schema = app_data["input_schema"]
@@ -92,11 +92,11 @@ async def generate_response(application_id: str, request: Dict[str, Any]):
         # we assume that the output validation from the graph/chain is agressive enough but in case its not we can still account for it
         decoded_resp = json.loads(resp)
         logger.info({"timestamp": datetime.now().isoformat(), "uuid": application_id, "msg": "Application AI Responded", "data": decoded_resp})
-        db_conn.log_application_interaction(application_id, {"sender": "ai", "msg": decoded_resp, "timestamp": datetime.now().isoformat()})
+        database.log_application_interaction(application_id, {"sender": "ai", "msg": decoded_resp, "timestamp": datetime.now().isoformat()})
         return decoded_resp
     except json.JSONDecodeError:
         # account for leaky json output from LLM model, always give completion
-        db_conn.log_application_interaction(application_id, {"sender": "ai", "msg": {"message": resp}, "timestamp": datetime.now().isoformat()})
+        database.log_application_interaction(application_id, {"sender": "ai", "msg": {"message": resp}, "timestamp": datetime.now().isoformat()})
         logger.warning({"timestamp": datetime.now().isoformat(), "uuid": application_id, "msg": "Leaky JSON Output Validation", "data": resp})
         return {"message": resp}
 
@@ -104,7 +104,7 @@ async def generate_response(application_id: str, request: Dict[str, Any]):
 def get_request_logs(application_id: str):
     # simple logs response, these are its respective application logs not system logs
     # so it only maintains interactions within the app and user, not errors from backend side
-    logs = db_conn.get_application_logs(application_id)
+    logs = database.get_application_logs(application_id)
     if logs is None:
         logger.info({"timestamp": datetime.now().isoformat(), "uuid": application_id, "msg": "Application not found", "data": "logs"})
         raise HTTPException(status_code=404, detail="Application not found")
