@@ -16,18 +16,27 @@ _LangGraph_ for LLM orchestration, _Pydantic_ for data validation,_MongoDB_ for 
 I will go over how to run the application, deploy it and briefly explain parts of the project.
 
 ### Running the Application via Make
+
 This project has a `Makefile` to ease interacting with it, do view it before you run any commands!
+
 1. `make install` will:
+
    - Create a virtual environment
    - `pip install` all the requirements
    - Have a ready `venv` for you to manually activate in your shell if you'd like
+
 2. `make run` will:
+
    - Run `install` and make sure you have a venv
    - Start the FastAPI server on [localhost:8000](http://localhost:8000)
+
 3. `make tests` will:
+
    - Run `install` and make sure you have a venv
    - Discover and run integration and unit tests for the project
+
 4. `make clean` will:
+
    - Remove the virtual environment
    - Clean up any cache files or directories
 
@@ -108,7 +117,7 @@ Follow these steps to get the application up and running:
 ### Endpoints
 
 #### 1. **GET /** - Serve Index Page
-Returns the frontend HTML for the applicationâ€™s main page.
+Returns the frontend HTML for the application’s main page.
 
 - **Path**: `/`
 - **Method**: `GET`
@@ -181,7 +190,7 @@ Deletes an existing application by its unique identifier.
       ```
 
 #### 4. **POST /applications/{application_id}/completions** - Generate LLM Completion
-Generates a response based on the applicationâ€™s configuration and user input, invoking the LLM.
+Generates a response based on the application’s configuration and user input, invoking the LLM.
 
 - **Path**: `/applications/{application_id}/completions`
 - **Method**: `POST`
