@@ -1,15 +1,14 @@
 import os
-import uuid
 from datetime import datetime
 from typing import Dict, Any, Optional, List
 from abc import ABC, abstractmethod
 from dotenv import load_dotenv
 from pymongo import MongoClient
+
 from cust_logger import logger
 
 # MongoDB configuration
 load_dotenv()
-from cust_logger import logger
 MONGO_URI = os.getenv("MONGO_URI")
 DATABASE_NAME = "apps_db"
 COLLECTION_NAME = "applications"

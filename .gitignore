@@ -6,6 +6,7 @@
 .env.test.local
 .env.production.local
 *.log
+deploy/mongo_data/
 
 # Ignore Python bytecode
 __pycache__/

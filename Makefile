@@ -7,7 +7,7 @@ install: $(VENV_DIR)/bin/activate
 
 $(VENV_DIR)/bin/activate:
 	python -m venv $(VENV_DIR)
-	@echo "Virtual environment created. Activate it with: source $(VENV_DIR)/bin/activate"
+	@echo "Virtual environment created. You can manually activate it within your shell: source $(VENV_DIR)/bin/activate"
 
 run: install
 	PYTHONPATH=src $(VENV_DIR)/bin/python -m uvicorn src.main:app --host 0.0.0.0
