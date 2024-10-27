@@ -6,13 +6,13 @@ Codebase accessible [here](https://bitbucket.org/shiv248/refuel-ai-coding-exerci
 
 ### LLM Application Server Project Summary
 
-This project involved building an API server for managing LLM-based applications, enabling users to define, use, and monitor applications powered by _OpenAI_ LLM. 
-Key features include endpoints to create new applications with specific prompt and schema configurations, process requests via these applications, 
-and retrieve logs of processed traffic for analysis. The server will leverage one of OpenAI's LLM models (`gpt-4o-mini`) as the application processor. 
-It also has simple deployment method for docker build/run and scalable deployment using docker-compose. This project also includes tests such as integration and unit, 
-in addition it handles schema validation and data type validation. For the LLM side if data generation isn't suited there are retry mechanisms in place for LLM call 
-chaining and retrieving previous attempts with errors embedded within prompts. The project is built in _Python_ using _OpenAI_ for LLM, _LangChain_ for integration, 
-_LangGraph_ for LLM orchestration, _Pydantic_ for data validation,_MongoDB_ for data storage at scale, _FastAPI_ and _Uvicorn_ for asynchronous request handling. 
+This project involved building an API server for managing LLM-based applications, enabling users to define, use, and monitor applications powered by _OpenAI_ LLM.
+Key features include endpoints to create new applications with specific prompt and schema configurations, process requests via these applications,
+and retrieve logs of processed traffic for analysis. The server will leverage one of OpenAI's LLM models (`gpt-4o-mini`) as the application processor.
+It also has simple deployment method for docker build/run and scalable deployment using docker-compose. This project also includes tests such as integration and unit,
+in addition it handles schema validation and data type validation. For the LLM side if data generation isn't suited there are retry mechanisms in place for LLM call
+chaining and retrieving previous attempts with errors embedded within prompts. The project is built in _Python_ using _OpenAI_ for LLM, _LangChain_ for integration,
+_LangGraph_ for LLM orchestration, _Pydantic_ for data validation,_MongoDB_ for data storage at scale, _FastAPI_ and _Uvicorn_ for asynchronous request handling.
 I will go over how to run the application, deploy it and briefly explain parts of the project.
 
 ### Running the Application via Make
@@ -25,7 +25,7 @@ This project has a `Makefile` to ease interacting with it, do view it before you
    - Run `install` and make sure you have a venv
    - Start the FastAPI server on [localhost:8000](http://localhost:8000)
 3. `make tests` will:
-   - Discover and run integration and unit tests for the project 
+   - Discover and run integration and unit tests for the project
 4. `make clean` will:
    - Remove the virtual environment
    - Clean up any cache files or directories
@@ -62,7 +62,7 @@ Follow these steps to get the application up and running:
    - **Docker**:
      - Using your favorite browser navigate to
      - [localhost:8000](http://localhost:8000)
-     
+
    - **Docker Compose**:
      - Using your favorite browser navigate to
      - [localhost:80](http://localhost:80)
@@ -73,7 +73,7 @@ Follow these steps to get the application up and running:
    - The basicAuth credentials are "`admin`:`pass`"
 
 7. To stop the application
-   - Press `Ctrl+C` in the terminal. 
+   - Press `Ctrl+C` in the terminal.
 8. To clean-up:
    - **Docker**:
      ```
@@ -84,14 +84,14 @@ Follow these steps to get the application up and running:
        docker system prune -a --volumes
         ```
      - Note this cleans up _All_ unused resources
-     
+
    - **Docker Compose**:
      ```
      docker-compose down -v --rmi all
      ```
      This will stop and remove the containers, networks, and volumes created by `docker-compose up`.
 
-### Briefly About The Project 
+### Briefly About The Project
 - Uses JSON or dict for data being passed around within the application
 - Asynchronous server for low latency non-blocking responses
 - Attempt at aggressive data validation and bespoken application schema validation using Pydantic V1
@@ -102,7 +102,7 @@ Follow these steps to get the application up and running:
 - LangChain for flexable LLM provider switching
 - Scalable with 3 replicas and a round-robin Nginx load balancer, data agnostic application with MongoDB as golden source
 
---- 
+---
 
 ### Endpoints
 
@@ -250,3 +250,15 @@ Fetches the log of interactions between user and app for a specified application
         "detail": "Application not found"
       }
       ```
+
+### Future Improvements
+- Better handle validation errors, more detail
+- Rather than returning errors one at a time append them to a list and return them all together for validate_app_construct_input
+- Be able to handle nested json in completion for validate input, validate_output_against_schema
+- Dynamically create pydantic BaseModel using pydantic.create_model
+- Better integration testing for mock external apis, mongodb, llm calls, ect.
+- WebSocket completion endpoint for streaming tokens
+- Prompt conversation/logging summary, token limitation
+- More extensive input validation and cleaning
+- Probably don't log during integration test
+- Better logging handling for json parsing json data when saving to file
