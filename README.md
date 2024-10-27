@@ -25,6 +25,7 @@ This project has a `Makefile` to ease interacting with it, do view it before you
    - Run `install` and make sure you have a venv
    - Start the FastAPI server on [localhost:8000](http://localhost:8000)
 3. `make tests` will:
+   - Run `install` and make sure you have a venv
    - Discover and run integration and unit tests for the project
 4. `make clean` will:
    - Remove the virtual environment
