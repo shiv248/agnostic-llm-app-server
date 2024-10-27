@@ -25,17 +25,19 @@ This project has a `Makefile` to ease interacting with it, do view it before you
    - `pip install` all the requirements
    - Have a ready `venv` for you to manually activate in your shell if you'd like
 
-2. `make run` will:
+2. Add your API key to `src/.env`, an example `.env` has been provided, before the next steps.
+
+3. `make run` will:
 
    - Run `install` and make sure you have a venv
    - Start the FastAPI server on [localhost:8000](http://localhost:8000)
 
-3. `make tests` will:
+4. `make tests` will:
 
    - Run `install` and make sure you have a venv
    - Discover and run integration and unit tests for the project
 
-4. `make clean` will:
+5. `make clean` will:
 
    - Remove the virtual environment
    - Clean up any cache files or directories
@@ -54,7 +56,8 @@ Follow these steps to get the application up and running:
    - **Docker Compose**:
      - Docker Desktop includes Docker Compose. For Linux, follow the instructions on [Docker Compose's official documentation](https://docs.docker.com/compose/install/).
 
-2. Build the project:
+2. Add your API key to `src/.env`, an example `.env` has been provided, before the next steps.
+3. Build the project:
    - **Docker**:
      - Navigate to the root directory.
      - `docker build -t llm-app .`
@@ -64,7 +67,7 @@ Follow these steps to get the application up and running:
      - Navigate to the `/deploy` folder
      - `docker-compose up --build`
 
-3. Access the project:
+4. Access the project:
    - Once the container(s) are up and running...
    - You can now interact with an LLM application
    - There are prefilled objects to play around with
@@ -77,14 +80,14 @@ Follow these steps to get the application up and running:
      - Using your favorite browser navigate to
      - [localhost:80](http://localhost:80)
 
-4. with Docker Compose:
+5. with Docker Compose:
    - You have access to an online mongodb GUI called `mongo-express`
    - Available on [localhost:1234](http://localhost:1234)
    - The basicAuth credentials are "`admin`:`pass`"
 
-7. To stop the application
+6. To stop the application
    - Press `Ctrl+C` in the terminal.
-8. To clean-up:
+7. To clean-up:
    - **Docker**:
      ```
        docker container prune
@@ -117,7 +120,7 @@ Follow these steps to get the application up and running:
 ### Endpoints
 
 #### 1. **GET /** - Serve Index Page
-Returns the frontend HTML for the application’s main page.
+Returns the frontend HTML for the applicationï¿½s main page.
 
 - **Path**: `/`
 - **Method**: `GET`
@@ -190,7 +193,7 @@ Deletes an existing application by its unique identifier.
       ```
 
 #### 4. **POST /applications/{application_id}/completions** - Generate LLM Completion
-Generates a response based on the application’s configuration and user input, invoking the LLM.
+Generates a response based on the applicationï¿½s configuration and user input, invoking the LLM.
 
 - **Path**: `/applications/{application_id}/completions`
 - **Method**: `POST`
