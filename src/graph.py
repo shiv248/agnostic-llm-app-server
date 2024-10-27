@@ -7,7 +7,7 @@ from typing import Annotated, TypedDict, Union, Dict, Any
 
 from dotenv import load_dotenv
 
-from langchain_fireworks import ChatFireworks
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables.config import RunnableConfig
 from langgraph.graph import START, END, StateGraph
@@ -20,7 +20,7 @@ set_files_message_color('MAGENTA') # file specific JSON logging of type
 
 # loads and checks if env var exists before continuing to model invocation
 load_dotenv()
-env_var_key = "FIREWORKS_API_KEY"
+env_var_key = "OPENAI_API_KEY"
 model_path = os.getenv(env_var_key)
 
 # If the API key is missing, log a fatal error and exit the application, no need to run LLM application without model!
@@ -29,11 +29,12 @@ if not model_path:
     sys.exit(1)
 
 try:
-    llm = ChatFireworks(
-        model="accounts/fireworks/models/firefunction-v2",
-        temperature=0.0,
-        streaming=True,
-        max_tokens=256
+    llm = ChatOpenAI(
+        model="gpt-4o-mini",
+        temperature=0,
+        max_tokens=None,
+        timeout=None,
+        streaming=True
     )
     logger.info({"timestamp": datetime.now().isoformat(), "msg": "Model initialized successfully. Ready to use!", "data": f"with {env_var_key}"})
 except Exception as e:

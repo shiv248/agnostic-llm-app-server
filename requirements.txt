@@ -3,5 +3,5 @@ uvicorn==0.30.6
 httpx
 python-dotenv
 langgraph
-langchain_fireworks
+langchain_openai
 colorama
