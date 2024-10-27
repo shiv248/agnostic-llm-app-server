@@ -1,0 +1,111 @@
+{
+	"info": {
+		"_postman_id": "084ec8db-ef75-4d6c-944e-2ba511c63887",
+		"name": "complex_1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "complex_create_app1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200',  ()=>{",
+							"   if( pm.response.to.have.status(200)){",
+							"        var jsonData = JSON.parse(responseBody);",
+							"",
+							"        pm.collectionVariables.set(\"application_id\",jsonData.application_id);",
+							"    }",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n           \"prompt_config\": \"You are an advanced sentiment analysis tool.\",\n           \"input_schema\": {\n             \"type\": \"object\",\n             \"properties\": {\n               \"review_text\": {\"type\": \"string\"},\n               \"author\": {\n                 \"type\": \"object\",\n                 \"properties\": {\n                   \"name\": {\"type\": \"string\"},\n                   \"email\": {\"type\": \"string\"}\n                 },\n                 \"required\": [\"name\"]\n               }\n             },\n             \"required\": [\"review_text\"]\n           },\n           \"output_schema\": {\n             \"type\": \"object\",\n             \"properties\": {\n               \"sentiment\": {\"type\": \"string\"},\n               \"metadata\": {\n                 \"type\": \"object\",\n                 \"properties\": {\n                   \"confidence\": {\"type\": \"number\"},\n                   \"source\": {\"type\": \"string\"}\n                 }\n               }\n             }\n           }\n         }"
+				},
+				"url": {
+					"raw": "http://localhost:8000/applications",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"applications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "complex_new_completion1",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n           \"review_text\": \"The product was excellent and exceeded expectations.\",\n           \"author\": {\n             \"name\": \"John Doe\",\n             \"email\": \"john.doe@example.com\"\n           }\n         }"
+				},
+				"url": {
+					"raw": "http://localhost:8000/applications/{{application_id}}/completions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"applications",
+						"{{application_id}}",
+						"completions"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "application_id",
+			"value": "\"\"",
+			"type": "default"
+		}
+	]
+}

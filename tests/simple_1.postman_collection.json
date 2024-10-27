@@ -1,0 +1,111 @@
+{
+	"info": {
+		"_postman_id": "551c75de-c014-4c73-b1d4-4046076a760a",
+		"name": "simple_1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "simple_create_app",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200',  ()=>{",
+							"   if( pm.response.to.have.status(200)){",
+							"        var jsonData = JSON.parse(responseBody);",
+							"",
+							"        pm.collectionVariables.set(\"application_id\",jsonData.application_id);",
+							"    }",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"prompt_config\": \"You are an advanced sentiment analysis tool designed to evaluate customer reviews from various online platforms. For the provided review, classify the overall sentiment as either positive, negative, or neutral. Focus on understanding the tone, language, and context of the review, and consider elements like word choice, punctuation, and implied meaning.\",\n  \"input_schema\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"review_text\": { \"type\": \"string\" }\n    },\n    \"required\": [\"review_text\"]\n  },\n  \"output_schema\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"sentiment\": { \"type\": \"string\" }\n    }\n  }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/applications",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"applications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "simple_new_completion",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"review_text\": \"I loved the food at this restaurant! The service was also great.\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/applications/{{application_id}}/completions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"applications",
+						"{{application_id}}",
+						"completions"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "application_id",
+			"value": "\"\"",
+			"type": "default"
+		}
+	]
+}
