@@ -58,6 +58,7 @@ Follow these steps to get the application up and running, you can run using stan
 
 2. Add your API key to `src/.env`, an example `.env` has been provided, before the next steps.
 3. Build and run the project:
+
    - **Docker**:
      - Navigate to the root directory.
      - `docker build -t llm-app .`
@@ -69,6 +70,7 @@ Follow these steps to get the application up and running, you can run using stan
      - `docker-compose up --build`
 
 4. Access the project:
+
    - Once the container(s) are up and running...
    - You can now interact with an LLM application
    - There are prefilled objects to play around with
