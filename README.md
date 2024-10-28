@@ -44,7 +44,7 @@ This project has a `Makefile` to ease interacting with it, do view it before you
 
 ### Running the Application via Docker
 
-Follow these steps to get the application up and running:
+Follow these steps to get the application up and running, you can run using standalone docker container or using docker-compose:
 
 1. Make sure you have Docker and Docker Compose installed on your system. If not, follow these instructions:
 
@@ -57,14 +57,15 @@ Follow these steps to get the application up and running:
      - Docker Desktop includes Docker Compose. For Linux, follow the instructions on [Docker Compose's official documentation](https://docs.docker.com/compose/install/).
 
 2. Add your API key to `src/.env`, an example `.env` has been provided, before the next steps.
-3. Build the project:
+3. Build and run the project:
    - **Docker**:
      - Navigate to the root directory.
      - `docker build -t llm-app .`
+     - `docker run -p 8000:8000 llm-app`
      - This will build a standalone container of the llm application
 
    - **Docker Compose**:
-     - Navigate to the `/deploy` folder
+     - Navigate to the `/deploy` folder from root directory. `cd /deploy`
      - `docker-compose up --build`
 
 4. Access the project:
