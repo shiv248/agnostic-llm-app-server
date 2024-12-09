@@ -1,9 +1,3 @@
-# Refuel.ai LLM Application Server Take-Home
-## by Shivanshu Gupta
-
-Live at [llm-app.shivgupta.xyz](https://llm-app.shivgupta.xyz/).
-Codebase accessible [here](https://bitbucket.org/shiv248/refuel-ai-coding-exercise/src/).
-
 ### LLM Application Server Project Summary
 
 This project involved building an API server for managing LLM-based applications, enabling users to define, use, and monitor applications powered by _OpenAI_ LLM.
