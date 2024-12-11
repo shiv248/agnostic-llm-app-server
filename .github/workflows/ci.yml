@@ -31,7 +31,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Step 4: Run tests using Makefile
+      # Step 4: Set environment variable from GitHub Secrets
+      - name: Set OPENAI_API_KEY environment variable
+        run: echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
+
+      # Step 5: Run tests using Makefile
       - name: Run tests
         run: |
           make tests
@@ -57,3 +61,10 @@ jobs:
           sleep 5  # Wait for the container to start
           curl -f http://localhost:8000 || (echo "Container failed to start"; exit 1)
           docker stop fastapi-test
+
+#      - name: Test Docker container
+#        run: |
+#          docker run --rm -d -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} --name fastapi-test -p 8000:8000 fastapi-app
+#          sleep 5  # Wait for the container to start
+#          curl -f http://localhost:8000 || (echo "Container failed to start"; exit 1)
+#          docker stop fastapi-test
