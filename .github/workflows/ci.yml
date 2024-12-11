@@ -84,9 +84,9 @@ jobs:
             echo ${{ secrets.HEROKU_API_KEY }} | heroku auth:token
 
         # Step 4: Log into the Heroku Container Registry
-        - name: Authenticate to Heroku
+        - name: Authenticate to Heroku Container Registry
           run: |
-            echo ${{ secrets.HEROKU_API_KEY }} | heroku auth:token
+            echo ${{ secrets.HEROKU_API_KEY }} | docker login --username=_ --password-stdin registry.heroku.com
 
         # Step 5: Build the Docker image for Heroku
         - name: Build Docker image for Heroku
