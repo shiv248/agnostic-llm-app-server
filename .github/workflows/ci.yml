@@ -61,3 +61,44 @@ jobs:
           sleep 5  # Wait for the container to start
           curl -f http://localhost:8000 || (echo "Container failed to start"; exit 1)
           docker stop fastapi-test
+
+  deploy:
+      runs-on: ubuntu-latest
+      needs: docker
+      if: success()  # Only run this job if previous jobs are successful
+
+      steps:
+        # Step 1: Checkout the repository
+        - name: Checkout code
+          uses: actions/checkout@v3
+
+        # Step 2: Set up Heroku CLI
+        - name: Set up Heroku CLI
+          run: |
+            curl https://cli-assets.heroku.com/install.sh | sh
+            echo "Heroku CLI installed"
+
+        # Step 3: Authenticate with Heroku using API key
+        - name: Authenticate to Heroku
+          run: |
+            echo ${{ secrets.HEROKU_API_KEY }} | heroku auth:token
+
+        # Step 4: Log into the Heroku Container Registry
+        - name: Log in to Heroku Container Registry
+          run: |
+            heroku container:login
+
+        # Step 5: Build the Docker image for Heroku
+        - name: Build Docker image for Heroku
+          run: |
+            heroku container:push web --app ${{ secrets.HEROKU_APP_NAME }}
+
+        # Step 6: Release the Docker image to Heroku
+        - name: Release Docker image to Heroku
+          run: |
+            heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
+
+        # Step 7: Verify the deployment
+        - name: Verify Heroku deployment
+          run: |
+            curl -f https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com || (echo "Heroku app deployment failed" && exit 1)
