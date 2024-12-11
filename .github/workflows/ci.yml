@@ -96,4 +96,4 @@ jobs:
         # Step 7: Verify the deployment
         - name: Verify Heroku deployment
           run: |
-            curl -f https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com || (echo "Heroku app deployment failed" && exit 1)
+            curl -f https://llm-app.shivgupta.xyz || (echo "Heroku app deployment failed" && exit 1)
