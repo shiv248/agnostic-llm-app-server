@@ -78,11 +78,6 @@ jobs:
             curl https://cli-assets.heroku.com/install.sh | sh
             echo "Heroku CLI installed"
 
-        # Step 3: Authenticate with Heroku using API key
-        - name: Authenticate to Heroku
-          run: |
-            echo ${{ secrets.HEROKU_API_KEY }} | heroku auth:token
-
         # Step 4: Log into the Heroku Container Registry
         - name: Authenticate to Heroku Container Registry
           run: |
